@@ -35,7 +35,7 @@ class ConsoleApp {
     }
     
     private func openBank() {
-        var bank = Bank()
+        var bank = Bank(depositBankerCount: 2, loanBankerCount: 1)
         bank.operate()
     }
 

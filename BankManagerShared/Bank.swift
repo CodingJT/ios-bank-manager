@@ -7,16 +7,11 @@ struct Bank {
     private init(bankers : [Banker]) {
         self.bankers = bankers
     }
-    
-    init() {
-        self.init(bankers: [GeneralBanker()])
-    }
 
-    init(bankerCount: Int) {
-        var bankerQueue:[Banker] = []
-        for _ in 0..<bankerCount {
-            bankerQueue.append(GeneralBanker())
-        }
+    init(depositBankerCount: Int, loanBankerCount: Int) {
+        var bankerQueue: [Banker] = []
+        bankerQueue.append(BankerType: LoanBanker(), count: loanBankerCount)
+        bankerQueue.append(BankerType: DepositBanker(), count: depositBankerCount)
         self.init(bankers: bankerQueue)
     }
 }
@@ -24,6 +19,7 @@ struct Bank {
 // MARK: - method
 
 extension Bank {
+    
     mutating func operate() {
         receiveCustomerQueue()
         BankManager.shared.startTimeCheck()
@@ -52,5 +48,13 @@ extension Bank {
     
     private func assign(customer: Customer, to banker: Banker) {
         banker.task(of: customer)
+    }
+}
+
+extension Array where Element == Banker {
+    mutating func append(BankerType: Banker, count: Int) {
+        for _ in 0..<count {
+            self.append(BankerType)
+        }
     }
 }

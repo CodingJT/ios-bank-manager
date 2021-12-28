@@ -35,25 +35,31 @@ extension Bank {
     
     private func open() {
         let group = DispatchGroup()
-        let loanQueue = DispatchQueue(label: TaskType.loan.description)
-        let depositQueue = DispatchQueue(label: TaskType.deposit.description)
+        let loanSemaphore = DispatchSemaphore(value: 2)
+        let depositSemaphore = DispatchSemaphore(value: 1)
+        
+        let loanQueue = DispatchQueue.global()
+        let depositQueue = DispatchQueue.global()
+        
         while let customer = customerQueue?.dequeue() {
-            let dispatchQueue: DispatchQueue
             switch customer.wantToTask {
             case .deposit:
-                dispatchQueue = depositQueue
+                depositQueue.async(group: group) {
+                    loanSemaphore.wait()
+                    assign(customer: customer, to: DepositBanker())
+                    loanSemaphore.signal()
+                }
             case .loan:
-                dispatchQueue = loanQueue
-            }
-            dispatchQueue.async(group: group) {
-                guard let banker = bankers.first else { return }
-                print("\(customer.customerNumber)번 고객 \(dispatchQueue.label)업무 시작")
-                assign(customer: customer, to: banker)
-                print("\(customer.customerNumber)번 고객 \(dispatchQueue.label)업무 완료")
+                loanQueue.async(group: group) {
+                    depositSemaphore.wait()
+                    assign(customer: customer, to: LoanBanker())
+                    depositSemaphore.signal()
+                }
             }
         }
         group.wait()
     }
+
     
     private func close() {
         let totalTimeText: String = String(format: "%.2f", BankManager.shared.totalTime)

@@ -1,5 +1,6 @@
 import Foundation
 
 struct Customer {
-    var customerNumber: Int
+    let customerNumber: Int
+    let wantToTask: TaskType
 }

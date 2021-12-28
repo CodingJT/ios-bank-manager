@@ -16,7 +16,10 @@ class BankManager {
         let customerQueue: Queue<Customer> = Queue<Customer>()
         
         (0..<customerCount).forEach {
-            let customer = Customer(customerNumber: $0 + 1)
+            guard let randomTask = TaskType.randomElement() else {
+                return
+            }
+            let customer = Customer(customerNumber: $0 + 1, wantToTask: randomTask)
             customerQueue.enqueue(customer)
         }
         return customerQueue

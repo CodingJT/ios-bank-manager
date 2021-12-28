@@ -11,7 +11,7 @@ class BankManager {
     var totalCustomer: Int = 0
     
     func lineUpCustomers() -> Queue<Customer> {
-        let range = 10...30
+        let range = 5...10
         let customerCount = Int.random(in: range)
         let customerQueue: Queue<Customer> = Queue<Customer>()
         
